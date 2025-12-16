@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8082/api";
+const API_BASE_URL = "https://projects.santosh.codes/oms/api";
 
 export interface AuthStore {
   token: string | null;

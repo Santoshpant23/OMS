@@ -143,16 +143,16 @@ export const useTradingStore = create<TradingStore>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await apiClient.get("/me/analytics");
-      // Response should contain stats and timeline data
       set({
-        stats: response.data.stats || response.data,
+        // FIX: Handle case where backend returns null for empty stats
+        stats: response.data.stats || response.data || null,
         isLoading: false,
       });
     } catch (err: any) {
       const errorMsg =
         err.response?.data || err.message || "Failed to fetch analytics";
       set({ error: errorMsg, isLoading: false });
-      throw err;
+      // Don't throw, just let UI show error or empty state
     }
   },
 
@@ -161,25 +161,25 @@ export const useTradingStore = create<TradingStore>((set) => ({
     try {
       const response = await apiClient.get("/me/orders");
       set({
-        trades: response.data,
+        // FIX: Default to [] if response.data is null (happens on fresh account)
+        trades: response.data || [],
         isLoading: false,
       });
     } catch (err: any) {
       const errorMsg =
         err.response?.data || err.message || "Failed to fetch trades";
       set({ error: errorMsg, isLoading: false });
-      throw err;
     }
   },
 
   fetchDashboardStats: async () => {
     try {
+      // This endpoint was missing in backend, we will add it now
       const response = await apiClient.get("/me/stats");
       set({
         dashboardStats: response.data,
       });
     } catch (err: any) {
-      // Silently fail for stats - don't break the dashboard
       console.error("Failed to fetch dashboard stats:", err);
     }
   },
